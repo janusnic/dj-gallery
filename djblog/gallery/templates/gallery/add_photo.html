@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+
+<div style="width: 400px; margin-left: 50px;">
+    <br>
+    <h3>Add Photo</h3><hr>
+    <form method="post" action="/gallery/save_photo/" enctype="multipart/form-data">{% csrf_token %}
+  <input type="hidden" name="album" value="{{ album.id }}" />
+  <fieldset class="form-group">
+    <label for="caption">Caption</label>
+    <input type="text" class="form-control" name="caption" placeholder="Photo caption">
+  </fieldset>
+
+  <fieldset class="form-group">
+    <label for="image">Image (Preview)</label>
+    <input type="file" class="form-control-file" name="img">
+    <small class="text-muted">This is thumnail/preview image to be ued for album.</small>
+  </fieldset>
+  <fieldset class="form-group">
+    <label for="public">Public
+    <input type="radio" class="form-control" name="public" checked="checked" value="1"></label>
+    <label for="public">Private
+        <input type="radio" class="form-control" name="public" value="0"></label>
+  </fieldset>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</div>
+
+{% endblock %}

@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from .fields import ThumbnailImageField
 
 class Album(models.Model):
     """
@@ -27,7 +28,10 @@ class Photo(models.Model):
     """
     user = models.ForeignKey(User)
     album = models.ForeignKey(Album)
-    img = models.ImageField(upload_to = 'photos/')
+    # img = models.ImageField(upload_to = 'photos/')
+    img = ThumbnailImageField(upload_to='photos')
+    caption = models.CharField(max_length=250, blank=True, verbose_name=_('Caption'))
+    public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Created at'))
 
     def __str__(self):
