@@ -2,6 +2,27 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Album, Photo
+from .forms import AlbumForm, CategoryForm, PhotoForm
+
+def main(request):
+    """Main listing."""
+    albums = Album.objects.all()
+    photos = Photo.objects.all()
+
+    paginator = Paginator(albums, 5)
+    try: page = int(request.GET.get("page", '1'))
+    except ValueError: page = 1
+
+    try:
+        albums = paginator.page(page)
+    except (InvalidPage, EmptyPage):
+        albums = paginator.page(paginator.num_pages)
+
+    for album in albums.object_list:
+        album.photos = album.photos()[:4]
+
+    return render(request, "list-recent.html", dict(albums=albums, photos=photos, user=request.user,
+        media_url=MEDIA_URL))
 
 @login_required
 def home(request):
@@ -9,12 +30,20 @@ def home(request):
     data = {"albums": albums}
     return render(request, 'gallery/index.html', data)
 
-
 @login_required
 def add_album(request):
-    data = {}
-    return render(request, 'gallery/add_album.html', data)
+    if request.method == "GET":
+        album = AlbumForm()
+    else:
+        album = AlbumForm(request.POST)
+        if album.is_valid():
+            obj = album.save(commit=False)
+            obj.user = request.user
+            obj.save()
+            return HttpResponseRedirect('/')
 
+    data = {'form': album}
+    return render(request, 'gallery/add_album.html', data)
 
 @login_required
 def show_album(request, pk):
